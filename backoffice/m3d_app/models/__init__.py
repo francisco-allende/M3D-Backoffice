@@ -5,3 +5,5 @@ from .suscriptor.particular_con_impresora import ParticularConImpresora
 from .suscriptor.particular_sin_impresora import ParticularSinImpresora
 from .nodos.nodo_recepcion import NodoRecepcion
 from .impresora.impresora import Impresora
+from .suscriptor.suscriptor import Suscriptor
+from .bloque3d.bloque import Bloque
