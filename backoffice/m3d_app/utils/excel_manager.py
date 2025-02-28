@@ -237,13 +237,11 @@ class ExcelManager:
                     suscriptor_data = {}
                     for col_excel, campo_modelo in columnas_suscriptor.items():
                         if col_excel in row and pd.notna(row[col_excel]):
-                            # Procesar campos especiales
-                            if campo_modelo == 'anios_experiencia':
-                                impresora_data[campo_modelo] = ExcelParser.parse_years_experience(row[col_excel])
-                            elif campo_modelo == 'cantidad_equipos':
-                                impresora_data[campo_modelo] = ExcelParser.parse_equipment_count(row[col_excel])
+                            # Procesar campos especiales de suscriptor
+                            if campo_modelo == 'fecha_nacimiento':
+                                suscriptor_data[campo_modelo] = ExcelParser.parse_date(row[col_excel])
                             else:
-                                impresora_data[campo_modelo] = row[col_excel]
+                                suscriptor_data[campo_modelo] = row[col_excel]
                     
                     # Añadir tipo suscriptor y nombre para el campo requerido
                     suscriptor_data['tipo'] = 'institucion'
@@ -263,12 +261,14 @@ class ExcelManager:
                     )
                     
                     # Crear impresora
-                    impresora_data = {}
+                    impresora_data = {}  
                     for col_excel, campo_modelo in columnas_impresora.items():
                         if col_excel in row and pd.notna(row[col_excel]):
-                            # Procesar campos especiales
+                            # Procesar campos especiales de impresora
                             if campo_modelo == 'anios_experiencia':
                                 impresora_data[campo_modelo] = ExcelParser.parse_years_experience(row[col_excel])
+                            elif campo_modelo == 'cantidad_equipos':
+                                impresora_data[campo_modelo] = ExcelParser.parse_equipment_count(row[col_excel])
                             else:
                                 impresora_data[campo_modelo] = row[col_excel]
                     
