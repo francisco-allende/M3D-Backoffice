@@ -91,12 +91,12 @@ class ExcelManager:
                     for col_excel, campo_modelo in columnas_suscriptor.items():
                         if col_excel in row and pd.notna(row[col_excel]):
                             # Procesar campos especiales
-                            if campo_modelo == 'anios_experiencia':
-                                impresora_data[campo_modelo] = ExcelParser.parse_years_experience(row[col_excel])
-                            elif campo_modelo == 'cantidad_equipos':
-                                impresora_data[campo_modelo] = ExcelParser.parse_equipment_count(row[col_excel])
+                            if campo_modelo == 'telefono':
+                                suscriptor_data[campo_modelo] = ExcelParser.clean_phone_number(row[col_excel])
+                            elif campo_modelo == 'fecha_nacimiento':
+                                suscriptor_data[campo_modelo] = ExcelParser.parse_date(row[col_excel])
                             else:
-                                impresora_data[campo_modelo] = row[col_excel]
+                                suscriptor_data[campo_modelo] = row[col_excel]
                     
                     # Añadir tipo suscriptor
                     suscriptor_data['tipo'] = 'particular'
@@ -120,6 +120,8 @@ class ExcelManager:
                             # Procesar campos especiales
                             if campo_modelo == 'anios_experiencia':
                                 impresora_data[campo_modelo] = ExcelParser.parse_years_experience(row[col_excel])
+                            elif campo_modelo == 'cantidad_equipos':
+                                impresora_data[campo_modelo] = ExcelParser.parse_equipment_count(row[col_excel])
                             else:
                                 impresora_data[campo_modelo] = row[col_excel]
                     
@@ -171,7 +173,9 @@ class ExcelManager:
                     for col_excel, campo_modelo in columnas_suscriptor.items():
                         if col_excel in row and pd.notna(row[col_excel]):
                             # Procesar campos especiales
-                            if campo_modelo == 'fecha_nacimiento':
+                            if campo_modelo == 'telefono':
+                                suscriptor_data[campo_modelo] = ExcelParser.clean_phone_number(row[col_excel])
+                            elif campo_modelo == 'fecha_nacimiento':
                                 suscriptor_data[campo_modelo] = ExcelParser.parse_date(row[col_excel])
                             else:
                                 suscriptor_data[campo_modelo] = row[col_excel]
@@ -238,7 +242,9 @@ class ExcelManager:
                     for col_excel, campo_modelo in columnas_suscriptor.items():
                         if col_excel in row and pd.notna(row[col_excel]):
                             # Procesar campos especiales de suscriptor
-                            if campo_modelo == 'fecha_nacimiento':
+                            if campo_modelo == 'telefono':
+                                suscriptor_data[campo_modelo] = ExcelParser.clean_phone_number(row[col_excel])
+                            elif campo_modelo == 'fecha_nacimiento':
                                 suscriptor_data[campo_modelo] = ExcelParser.parse_date(row[col_excel])
                             else:
                                 suscriptor_data[campo_modelo] = row[col_excel]
@@ -326,7 +332,9 @@ class ExcelManager:
                     for col_excel, campo_modelo in columnas_suscriptor.items():
                         if col_excel in row and pd.notna(row[col_excel]):
                             # Procesar campos especiales
-                            if campo_modelo == 'fecha_nacimiento':
+                            if campo_modelo == 'telefono':
+                                suscriptor_data[campo_modelo] = ExcelParser.clean_phone_number(row[col_excel])
+                            elif campo_modelo == 'fecha_nacimiento':
                                 suscriptor_data[campo_modelo] = ExcelParser.parse_date(row[col_excel])
                             else:
                                 suscriptor_data[campo_modelo] = row[col_excel]

@@ -3,9 +3,28 @@ import pandas as pd
 from datetime import datetime
 
 class ExcelParser:
-    """
-    Clase con métodos estáticos para parsear y convertir datos de Excel.
-    """
+   
+    @staticmethod
+    def clean_phone_number(phone_str):
+        """
+        Limpia un número de teléfono, eliminando apóstrofes iniciales y otros caracteres no deseados.
+        
+        Args:
+            phone_str: Cadena de texto que representa un número de teléfono.
+            
+        Returns:
+            str: Número de teléfono limpio.
+        """
+        if not phone_str or pd.isna(phone_str):
+            return ""
+            
+        # Convertir a string si no lo es
+        phone_str = str(phone_str).strip()
+        
+        # Eliminar apóstrofes al inicio
+        phone_str = phone_str.lstrip("'")
+        
+        return phone_str
     
     @staticmethod
     def parse_date(date_str):
