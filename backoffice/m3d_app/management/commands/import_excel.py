@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 import logging
 import os
 from m3d_app.utils.excel_manager import ExcelManager
-
+#te amo mucho
 class Command(BaseCommand):
     help = 'Importa datos de suscriptores desde archivos Excel'
 
@@ -12,7 +12,8 @@ class Command(BaseCommand):
             'particulares_con_impresora',
             'particulares_sin_impresora',
             'instituciones_con_impresora',
-            'instituciones_sin_impresora'
+            'instituciones_sin_impresora',
+            'nodos_recepcion'
         ], help='Tipo de datos a importar')
         parser.add_argument('--sheet', type=str, default='0', help='Nombre o índice de la hoja (por defecto: 0)')
 

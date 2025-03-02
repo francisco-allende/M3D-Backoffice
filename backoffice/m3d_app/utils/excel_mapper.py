@@ -142,3 +142,21 @@ class ExcelMapper:
         'Nombre y Apellido del responsable': 'nombre_responsable',
         'DNI': 'dni_responsable'
     }
+
+    @staticmethod
+    def columnas_nodo_recepcion():
+        return {
+            'Orden': 'numero_orden',
+            'Bloque': 'numero_bloque',
+            'Responsable de impresión': 'responsable_impresion',
+            'Calle': 'calle',
+            'Número': 'numero',
+            'CP': 'codigo_postal',
+            'Localidad': 'localidad',
+            'Departamento': 'departamento',
+            'Provincia': 'provincia',
+            'Teléfono': 'telefono',
+            'Email': 'email',
+            'Nodo seleccionado': 'nodo_seleccionado',
+            'Detalles sobre el nodo': 'detalles_nodo'
+        }

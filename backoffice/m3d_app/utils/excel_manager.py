@@ -11,6 +11,7 @@ from m3d_app.models.suscriptor.particular_con_impresora import ParticularConImpr
 from m3d_app.models.suscriptor.particular_sin_impresora import ParticularSinImpresora
 from m3d_app.models.suscriptor.institucion_con_impresora import InstitucionConImpresora
 from m3d_app.models.suscriptor.institucion_sin_impresora import InstitucionSinImpresora
+from m3d_app.models.nodos.nodo_recepcion import NodoRecepcion
 from m3d_app.utils.excel_mapper import ExcelMapper
 from m3d_app.utils.excel_parser import ExcelParser
 
@@ -375,4 +376,78 @@ class ExcelManager:
                 self.log(f"Error al procesar fila {idx+2}: {str(e)}", 'error')
                 self.log(f"Datos: {row.to_dict()}", 'debug')
                 
+        return registros_creados, registros_con_error
+    
+    @transaction.atomic
+    def import_nodos_recepcion(self, file_path, sheet_name=0):
+        """
+        Importa datos de nodos de recepción desde un Excel.
+        
+        Args:
+            file_path: Ruta al archivo Excel.
+            sheet_name: Nombre o índice de la hoja a leer.
+            
+        Returns:
+            Tuple: (registros_creados, registros_con_error)
+        """
+        df = self.read_excel(file_path, sheet_name)
+        
+        # Contadores para seguimiento
+        registros_creados = 0
+        registros_con_error = 0
+        
+        # Obtener los mapeos de columnas del ExcelMapper
+        columnas_nodo = ExcelMapper.columnas_nodo_recepcion()
+        
+        # Procesar cada fila del Excel
+        for idx, row in df.iterrows():
+            try:
+                with transaction.atomic():
+                    # Preparar datos del nodo
+                    nodo_data = {}
+                    email_suscriptor = None
+                    
+                    for col_excel, campo_modelo in columnas_nodo.items():
+                        if col_excel in row and pd.notna(row[col_excel]):
+                            # Procesar campos especiales
+                            if campo_modelo == 'telefono':
+                                nodo_data[campo_modelo] = ExcelParser.clean_phone_number(row[col_excel])
+                            elif campo_modelo == 'email':
+                                nodo_data[campo_modelo] = row[col_excel]
+                                email_suscriptor = row[col_excel]  # Guardar email para buscar suscriptor
+                            else:
+                                nodo_data[campo_modelo] = row[col_excel]
+                    
+                    # Buscar suscriptor por email
+                    if not email_suscriptor:
+                        self.log(f"Fila {idx+2} sin email, omitiendo", 'warning')
+                        registros_con_error += 1
+                        continue
+                    
+                    try:
+                        suscriptor = Suscriptor.objects.get(email=email_suscriptor)
+                    except Suscriptor.DoesNotExist:
+                        self.log(f"Fila {idx+2}: Suscriptor con email {email_suscriptor} no encontrado, omitiendo", 'warning')
+                        registros_con_error += 1
+                        continue
+                    
+                    # Agregar suscriptor al nodo
+                    nodo_data['suscriptor'] = suscriptor
+                    
+                    # Crear o actualizar nodo
+                    # Si ya existe un nodo con la misma combinación de suscriptor y número de bloque, se actualiza
+                    nodo, created = NodoRecepcion.objects.update_or_create(
+                        suscriptor=suscriptor,
+                        numero_bloque=nodo_data.get('numero_bloque', ''),
+                        defaults=nodo_data
+                    )
+                    
+                    registros_creados += 1
+                    self.log(f"Fila {idx+2}: Nodo de recepción {'creado' if created else 'actualizado'} - {nodo}", 'info')
+                    
+            except Exception as e:
+                registros_con_error += 1
+                self.log(f"Error al procesar fila {idx+2}: {str(e)}", 'error')
+                self.log(f"Datos: {row.to_dict()}", 'debug')
+                    
         return registros_creados, registros_con_error
