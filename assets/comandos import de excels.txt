@@ -9,3 +9,6 @@ python manage.py import_excel --file="C:\\Users\\fallende\\Desktop\\M3D\\M3D-Bac
 
 # Importar instituciones sin impresora
 python manage.py import_excel --file="C:\\Users\\fallende\\Desktop\\M3D\\M3D-Backoffice\\assets\\form-instituciones-sin-impresora.xlsx" --type=instituciones_sin_impresora
+
+#Importar nodos de recepción
+py manage.py import_excel --file='C:\Users\fallende\Desktop\M3D\M3D-Backoffice\assets\nodos-de-recepcion.xlsx' --type=nodos_recepcion

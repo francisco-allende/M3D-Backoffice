@@ -143,20 +143,26 @@ class ExcelMapper:
         'DNI': 'dni_responsable'
     }
 
+    # 5. Mapeo para nodos de recepcion (nodosrecepcion.xlsx)
+    # ---------------------------------------------------------
     @staticmethod
     def columnas_nodo_recepcion():
+        """
+        Mapeo de columnas para el archivo de nodos de recepción.
+        Basado en los nombres exactos de columnas del Excel, excluyendo campos no existentes en el modelo.
+        """
         return {
-            'Orden': 'numero_orden',
-            'Bloque': 'numero_bloque',
-            'Responsable de impresión': 'responsable_impresion',
-            'Calle': 'calle',
-            'Número': 'numero',
-            'CP': 'codigo_postal',
-            'Localidad': 'localidad',
-            'Departamento': 'departamento',
-            'Provincia': 'provincia',
-            'Teléfono': 'telefono',
-            'Email': 'email',
-            'Nodo seleccionado': 'nodo_seleccionado',
-            'Detalles sobre el nodo': 'detalles_nodo'
+            'Número/s de orden de 4 cifras:': 'numero_orden',
+            'Numero/s de bloque/s de 2 cifras:': 'numero_bloque',
+            # Excluimos 'Nombre del participante particular o institución:' ya que no existe en el modelo
+            'Nombre del responsable de impresión 3d:': 'responsable_impresion',
+            'Calle:': 'calle',
+            'Numero:': 'numero',
+            'Codigo Postal:': 'codigo_postal',
+            'Localidad:': 'localidad',
+            'Departamento:': 'departamento',
+            'Provincia:': 'provincia',
+            'Teléfono:': 'telefono',
+            'Correo electrónico:': 'email',
+            'Seleccionar Nodo:': 'nodo_seleccionado'
         }
