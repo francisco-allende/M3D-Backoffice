@@ -1,6 +1,7 @@
 # m3d_app/views.py
 from rest_framework import viewsets
 from django.shortcuts import render
+from django.db.models import Q
 
 from .models.suscriptor.suscriptor import Suscriptor
 from .models.suscriptor.particular_con_impresora import ParticularConImpresora
@@ -13,7 +14,7 @@ from .models.nodos.nodo_recepcion import NodoRecepcion
 
 # Importaciones de serializadores desde tu archivo serializers.py
 from .serializers import (
-    SuscriptorSerializer, ImpresoraSerializer, 
+    SuscriptorConBloquesSerializer, SuscriptorSerializer, ImpresoraSerializer, 
     ParticularConImpresoraSerializer, ParticularSinImpresoraSerializer,
     InstitucionConImpresoraSerializer, InstitucionSinImpresoraSerializer,
     BloqueSerializer, NodoRecepcionSerializer
@@ -55,3 +56,42 @@ class BloqueViewSet(viewsets.ModelViewSet):
 class NodoRecepcionViewSet(viewsets.ModelViewSet):
     queryset = NodoRecepcion.objects.all()
     serializer_class = NodoRecepcionSerializer
+
+# En m3d_app/views.py, añadir esta vista
+
+class SuscriptorConBloquesViewSet(viewsets.ReadOnlyModelViewSet):
+    """
+    ViewSet para listar suscriptores con sus bloques asignados.
+    Permite filtrar por tipo de suscriptor, email y otros campos.
+    """
+    queryset = Suscriptor.objects.all().prefetch_related('bloques')
+    serializer_class = SuscriptorConBloquesSerializer
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        
+        # Filtrar por tipo de suscriptor (particular, institucion)
+        tipo = self.request.query_params.get('tipo', None)
+        if tipo:
+            queryset = queryset.filter(tipo=tipo)
+            
+        # Filtrar por email
+        email = self.request.query_params.get('email', None)
+        if email:
+            queryset = queryset.filter(email__icontains=email)
+            
+        # Filtrar por nombre/apellido/nombre_institucion
+        nombre = self.request.query_params.get('nombre', None)
+        if nombre:
+            queryset = queryset.filter(
+                Q(nombre__icontains=nombre) | 
+                Q(apellido__icontains=nombre) |
+                Q(nombre_institucion__icontains=nombre)
+            )
+            
+        # Solo incluir suscriptores que tienen bloques asignados
+        solo_con_bloques = self.request.query_params.get('solo_con_bloques', 'true')
+        if solo_con_bloques.lower() == 'true':
+            queryset = queryset.filter(bloques__isnull=False).distinct()
+            
+        return queryset

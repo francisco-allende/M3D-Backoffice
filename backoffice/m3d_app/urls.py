@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
+from backoffice.m3d_app.views import SuscriptorConBloquesViewSet
 from m3d_app.views import my_view
 from m3d_app.views import SuscriptorViewSet, ImpresoraViewSet, ParticularConImpresoraViewSet
 from m3d_app.views import ParticularSinImpresoraViewSet, InstitucionConImpresoraViewSet, InstitucionSinImpresoraViewSet
@@ -32,6 +33,7 @@ router.register(r'instituciones-con-impresora', InstitucionConImpresoraViewSet)
 router.register(r'instituciones-sin-impresora', InstitucionSinImpresoraViewSet)
 router.register(r'bloques', BloqueViewSet)
 router.register(r'nodos-recepcion', NodoRecepcionViewSet)
+router.register(r'suscriptores-con-bloques', SuscriptorConBloquesViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),

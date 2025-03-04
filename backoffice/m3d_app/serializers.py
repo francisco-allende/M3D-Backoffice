@@ -57,3 +57,15 @@ class NodoRecepcionSerializer(serializers.ModelSerializer):
     class Meta:
         model = NodoRecepcion
         fields = '__all__'
+
+class BloqueResumidoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Bloque
+        fields = ['id', 'numero_bloque', 'seccion', 'numero', 'estado']
+
+class SuscriptorConBloquesSerializer(serializers.ModelSerializer):
+    bloques = BloqueResumidoSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = Suscriptor
+        fields = ['id', 'nombre', 'apellido', 'nombre_institucion', 'email', 'tipo', 'bloques']
