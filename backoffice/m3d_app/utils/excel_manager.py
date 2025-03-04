@@ -12,6 +12,7 @@ from m3d_app.models.suscriptor.particular_sin_impresora import ParticularSinImpr
 from m3d_app.models.suscriptor.institucion_con_impresora import InstitucionConImpresora
 from m3d_app.models.suscriptor.institucion_sin_impresora import InstitucionSinImpresora
 from m3d_app.models.nodos.nodo_recepcion import NodoRecepcion
+from m3d_app.models.bloque3d.bloque import Bloque
 from m3d_app.utils.excel_mapper import ExcelMapper
 from m3d_app.utils.excel_parser import ExcelParser
 
@@ -576,3 +577,172 @@ class ExcelManager:
                     
         self.log(f"Total de suscriptores creados automáticamente: {suscriptores_creados}", 'info')
         return registros_creados, registros_con_error
+    
+    @transaction.atomic
+    def import_bloques_participantes(self, file_path, sheet_name=0):
+        """
+        Importa datos de bloques y su asignación a suscriptores desde Excel.
+        
+        Args:
+            file_path: Ruta al archivo Excel.
+            sheet_name: Nombre o índice de la hoja a leer.
+            
+        Returns:
+            Tuple: (bloques_creados, bloques_actualizados, bloques_con_error)
+        """
+        # Leer Excel sin encabezados, usando posiciones numéricas
+        df = pd.read_excel(file_path, sheet_name=sheet_name, header=None)
+        
+        self.log(f"Archivo leído correctamente. Dimensiones: {df.shape}", 'info')
+        
+        # Contadores para seguimiento
+        bloques_creados = 0
+        bloques_actualizados = 0
+        bloques_con_error = 0
+        
+        # Índices de columnas relevantes (ajustar según la estructura real del Excel)
+        COL_ID = 0           # Primera columna (número/ID)
+        COL_PREFIJO = 1      # Segunda columna (M3D)
+        COL_BLOQUE = 2       # Tercera columna (número de bloque)
+        COL_EMAIL = 3        # Columna con email del suscriptor
+        COL_VALIDACION = 12  # Columna con estado de foto de validación
+        COL_ENTREGADO = 13   # Columna con estado de entregado en nodo
+        COL_RECIBIDO = 14    # Columna con estado de recibido en M3D
+        COL_DIPLOMA = 15     # Columna con estado de diploma entregado
+        
+        # La última institución procesada y sus bloques
+        ultima_institucion_email = None
+        bloques_institucion = []
+        
+        # Fecha actual para campos de fecha
+        from django.utils import timezone
+        now = timezone.now()
+        
+        # Imprimir primeras filas para debug
+        self.log(f"Primeras 3 filas del Excel: {df.head(3)}", 'info')
+        
+        # Procesar cada fila del Excel
+        for idx, row in df.iterrows():
+            try:
+                # Saltear primera fila si contiene encabezados
+                if idx == 0 and isinstance(row[COL_BLOQUE], str) and not row[COL_BLOQUE].strip().startswith(('0', '1', '2', '3', '4', '5', '6')):
+                    self.log("Saltando primera fila (encabezados)", 'info')
+                    continue
+                    
+                with transaction.atomic():
+                    # Obtener número de bloque
+                    if COL_BLOQUE >= len(row) or pd.isna(row[COL_BLOQUE]):
+                        self.log(f"Fila {idx+1}: No hay número de bloque, omitiendo", 'warning')
+                        continue
+                        
+                    numero_bloque = str(row[COL_BLOQUE]).strip()
+                    if not numero_bloque or numero_bloque.lower() == 'nan':
+                        self.log(f"Fila {idx+1}: Número de bloque vacío, omitiendo", 'warning')
+                        continue
+                    
+                    # Obtener email del suscriptor
+                    email_suscriptor = None
+                    if COL_EMAIL < len(row) and not pd.isna(row[COL_EMAIL]):
+                        email_suscriptor = str(row[COL_EMAIL]).strip()
+                    
+                    # Si es una fila vacía de una institución (que tiene 3 bloques)
+                    if not email_suscriptor or email_suscriptor.lower() == 'nan':
+                        # Si ya procesamos una institución, podría ser uno de sus bloques adicionales
+                        if ultima_institucion_email and len(bloques_institucion) < 3:
+                            self.log(f"Fila {idx+1}: Asignando bloque adicional a la institución con email {ultima_institucion_email}", 'info')
+                            email_suscriptor = ultima_institucion_email
+                        else:
+                            # Si no hay email y no pertenece a una institución ya procesada, es un bloque libre
+                            self.log(f"Fila {idx+1}: No hay email, bloque libre", 'info')
+                            suscriptor = None
+                            estado = 'libre'
+                            nodo_recepcion = None
+                    else:
+                        # Buscar el suscriptor por email
+                        try:
+                            suscriptor = Suscriptor.objects.get(email=email_suscriptor)
+                            
+                            # Verificar si es una institución
+                            if suscriptor.tipo == 'institucion':
+                                ultima_institucion_email = email_suscriptor
+                                bloques_institucion.append(numero_bloque)
+                                self.log(f"Fila {idx+1}: Institución encontrada, email={email_suscriptor}, bloques={bloques_institucion}", 'info')
+                            else:
+                                # Si es un particular, reiniciamos el seguimiento de instituciones
+                                ultima_institucion_email = None
+                                bloques_institucion = []
+                            
+                            # Buscar el nodo asociado al suscriptor (si existe)
+                            nodo_recepcion = NodoRecepcion.objects.filter(suscriptor=suscriptor).first()
+                            
+                            # Si hay suscriptor, el estado mínimo es 'asignado'
+                            estado = 'asignado'
+                        except Suscriptor.DoesNotExist:
+                            self.log(f"Fila {idx+1}: No se encontró suscriptor con email {email_suscriptor}", 'warning')
+                            suscriptor = None
+                            estado = 'libre'
+                            nodo_recepcion = None
+                    
+                    # Determinar el estado del bloque basado en las columnas de estado
+                    # Priorizamos el estado más avanzado
+                    estados = []
+                    if COL_DIPLOMA < len(row) and not pd.isna(row[COL_DIPLOMA]) and row[COL_DIPLOMA] == 1:
+                        estados.append('diploma_entregado')
+                    if COL_RECIBIDO < len(row) and not pd.isna(row[COL_RECIBIDO]) and row[COL_RECIBIDO] == 1:
+                        estados.append('recibido_m3d')
+                    if COL_ENTREGADO < len(row) and not pd.isna(row[COL_ENTREGADO]) and row[COL_ENTREGADO] == 1:
+                        estados.append('entregado_nodo')
+                    if COL_VALIDACION < len(row) and not pd.isna(row[COL_VALIDACION]) and row[COL_VALIDACION] == 1:
+                        estados.append('validacion')
+                    
+                    # Seleccionar el estado más avanzado si existe
+                    if estados:
+                        # Orden de prioridad: diploma_entregado > recibido_m3d > entregado_nodo > validacion > asignado > libre
+                        orden_estados = ['libre', 'asignado', 'validacion', 'entregado_nodo', 'recibido_m3d', 'diploma_entregado']
+                        estado = max(estados, key=lambda x: orden_estados.index(x))
+                    
+                    # Preparar datos del bloque
+                    bloque_data = {
+                        'numero_bloque': numero_bloque,
+                        'suscriptor': suscriptor,
+                        'nodo_recepcion': nodo_recepcion,
+                        'estado': estado
+                    }
+                    
+                    # Establecer fechas según el estado
+                    if estado != 'libre':
+                        bloque_data['fecha_asignacion'] = now
+                    if estado in ['validacion', 'entregado_nodo', 'recibido_m3d', 'diploma_entregado']:
+                        bloque_data['fecha_validacion'] = now
+                    if estado in ['entregado_nodo', 'recibido_m3d', 'diploma_entregado']:
+                        bloque_data['fecha_entrega_nodo'] = now
+                    if estado in ['recibido_m3d', 'diploma_entregado']:
+                        bloque_data['fecha_recepcion_m3d'] = now
+                    if estado == 'diploma_entregado':
+                        bloque_data['fecha_entrega_diploma'] = now
+                    
+                    # Crear o actualizar el bloque
+                    try:
+                        bloque, created = Bloque.objects.update_or_create(
+                            numero_bloque=numero_bloque,
+                            defaults=bloque_data
+                        )
+                        
+                        if created:
+                            bloques_creados += 1
+                            self.log(f"Fila {idx+1}: Bloque {numero_bloque} creado con estado {estado}", 'info')
+                        else:
+                            bloques_actualizados += 1
+                            self.log(f"Fila {idx+1}: Bloque {numero_bloque} actualizado con estado {estado}", 'info')
+                        
+                    except Exception as e:
+                        bloques_con_error += 1
+                        self.log(f"Error al crear/actualizar bloque {numero_bloque}: {str(e)}", 'error')
+                    
+            except Exception as e:
+                bloques_con_error += 1
+                self.log(f"Error al procesar fila {idx+1}: {str(e)}", 'error')
+                self.log(f"Datos de la fila: {row.to_dict() if hasattr(row, 'to_dict') else list(row)}", 'debug')
+        
+        self.log(f"Importación completada: {bloques_creados} bloques creados, {bloques_actualizados} bloques actualizados, {bloques_con_error} bloques con error", 'info')
+        return bloques_creados, bloques_actualizados, bloques_con_error

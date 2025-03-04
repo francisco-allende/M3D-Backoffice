@@ -166,3 +166,23 @@ class ExcelMapper:
             'Correo electrónico:': 'email',
             'Seleccionar Nodo:': 'nodo_seleccionado'
         }
+    
+    
+    # 6. Mapeo para bloques (PARTICIPANTESMALVINAS3D.xlsx)
+    # ---------------------------------------------------------
+    # Añadir a m3d_app/utils/excel_mapper.py
+
+    @staticmethod
+    def columnas_bloque_participantes():
+        return {
+            'N sorteo': 'numero_orden',                # Primera columna con números de identificación
+            'prefijo': 'prefijo_m3d',            # Columna con "M3D"
+            'bloque': 'numero_bloque',           # Columna con número de bloque (ej: "10-12")
+            'MAIL': 'email_suscriptor',            # Email para relacionar con el suscriptor
+            'VALIDA FOTO': 'estado_validacion',
+            'anoto nodo': 'estado_entregado_nodo',
+            'RECIBIMOS': 'estado_recibido_m3d',
+            'Diploma OK': 'estado_diploma_entregado'
+        }
+    
+    

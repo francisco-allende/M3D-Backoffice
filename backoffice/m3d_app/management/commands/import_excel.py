@@ -13,7 +13,8 @@ class Command(BaseCommand):
             'particulares_sin_impresora',
             'instituciones_con_impresora',
             'instituciones_sin_impresora',
-            'nodos_recepcion'
+            'nodos_recepcion',
+            'bloques_participantes'
         ], help='Tipo de datos a importar')
         parser.add_argument('--sheet', type=str, default='0', help='Nombre o índice de la hoja (por defecto: 0)')
 
@@ -58,11 +59,20 @@ class Command(BaseCommand):
                 raise CommandError(f'Tipo de importación no válido: {import_type}')
             
             import_method = getattr(excel_manager, method_name)
-            registros_creados, registros_con_error = import_method(file_path, sheet_name)
             
-            self.stdout.write(self.style.SUCCESS(
-                f'Importación completada: {registros_creados} registros creados, {registros_con_error} registros con error'
-            ))
+            # Manejar de forma diferente según el tipo de importación
+            if import_type == 'bloques_participantes':
+                registros_creados, registros_actualizados, registros_con_error = import_method(file_path, sheet_name)
+                self.stdout.write(self.style.SUCCESS(
+                    f'Importación completada: {registros_creados} registros creados, {registros_actualizados} registros actualizados, {registros_con_error} registros con error'
+                ))
+            else:
+                registros_creados, registros_con_error = import_method(file_path, sheet_name)
+                self.stdout.write(self.style.SUCCESS(
+                    f'Importación completada: {registros_creados} registros creados, {registros_con_error} registros con error'
+                ))
             
         except Exception as e:
+            import traceback
+            self.stdout.write(self.style.ERROR(f'Error detallado: {traceback.format_exc()}'))
             raise CommandError(f'Error durante la importación: {str(e)}')

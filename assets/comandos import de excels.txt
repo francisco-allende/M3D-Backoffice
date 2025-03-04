@@ -12,3 +12,6 @@ python manage.py import_excel --file="C:\\Users\\fallende\\Desktop\\M3D\\M3D-Bac
 
 #Importar nodos de recepción
 py manage.py import_excel --file='C:\Users\fallende\Desktop\M3D\M3D-Backoffice\assets\nodos-de-recepcion.xlsx' --type=nodos_recepcion
+
+#Importar bloques. nombre confuso. Excel mas importante.
+py manage.py import_excel --file='C:\Users\fallende\Desktop\M3D\M3D-Backoffice\assets\Participantes MALVINAS3D.xlsx' --type=bloques_participantes
