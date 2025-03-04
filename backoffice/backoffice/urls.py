@@ -26,7 +26,8 @@ from m3d_app.views import (
     InstitucionConImpresoraViewSet,
     InstitucionSinImpresoraViewSet,
     BloqueViewSet,
-    NodoRecepcionViewSet
+    NodoRecepcionViewSet,
+    SuscriptorConBloquesViewSet
 )
 
 # Configurar el router para APIs
@@ -39,6 +40,7 @@ router.register(r'instituciones-con-impresora', InstitucionConImpresoraViewSet)
 router.register(r'instituciones-sin-impresora', InstitucionSinImpresoraViewSet)
 router.register(r'bloques', BloqueViewSet)
 router.register(r'nodos-recepcion', NodoRecepcionViewSet)
+router.register(r'suscriptores-con-bloques', SuscriptorConBloquesViewSet, basename='suscriptor-con-bloques')
 
 urlpatterns = [
     path('admin/', admin.site.urls),

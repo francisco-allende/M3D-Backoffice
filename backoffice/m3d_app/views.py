@@ -1,7 +1,10 @@
 # m3d_app/views.py
+from django.http import HttpResponse
 from rest_framework import viewsets
 from django.shortcuts import render
 from django.db.models import Q
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
 from .models.suscriptor.suscriptor import Suscriptor
 from .models.suscriptor.particular_con_impresora import ParticularConImpresora
@@ -56,8 +59,6 @@ class BloqueViewSet(viewsets.ModelViewSet):
 class NodoRecepcionViewSet(viewsets.ModelViewSet):
     queryset = NodoRecepcion.objects.all()
     serializer_class = NodoRecepcionSerializer
-
-# En m3d_app/views.py, añadir esta vista
 
 class SuscriptorConBloquesViewSet(viewsets.ReadOnlyModelViewSet):
     """

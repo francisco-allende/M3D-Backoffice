@@ -1,3 +1,5 @@
+# En m3d_app/admin.py añade:
+
 from django.contrib import admin
 from .models.suscriptor.suscriptor import Suscriptor 
 from .models.suscriptor.institucion_con_impresora import InstitucionConImpresora
@@ -16,7 +18,17 @@ class BloqueAdmin(admin.ModelAdmin):
     readonly_fields = ('seccion', 'numero')
     date_hierarchy = 'fecha_asignacion'
 
-admin.site.register(Suscriptor)
+# Clase para la visualización de Suscriptor con sus bloques
+class SuscriptorAdmin(admin.ModelAdmin):
+    list_display = ('id', 'nombre', 'apellido', 'nombre_institucion', 'email', 'tipo', 'get_bloques_count')
+    list_filter = ('tipo', 'provincia')
+    search_fields = ('nombre', 'apellido', 'nombre_institucion', 'email')
+    
+    def get_bloques_count(self, obj):
+        return obj.bloques.count()
+    get_bloques_count.short_description = 'Número de bloques'
+
+admin.site.register(Suscriptor, SuscriptorAdmin)
 admin.site.register(InstitucionConImpresora)
 admin.site.register(InstitucionSinImpresora)
 admin.site.register(ParticularConImpresora)
