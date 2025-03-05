@@ -24,6 +24,6 @@ class Suscriptor(models.Model):
 
     def __str__(self):
         if self.nombre_institucion:
-            return self.nombre_institucion
+            return f"{self.nombre_institucion} - {self.email}"
         apellido = self.apellido or ""  # Si apellido es None, usa una cadena vacía
-        return f"{self.nombre} {apellido}".strip()  # strip() elimina espacios en blanco sobrantes
+        return f"{self.nombre} {apellido} {self.email}".strip()  # strip() elimina espacios en blanco sobrantes

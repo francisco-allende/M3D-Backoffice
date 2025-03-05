@@ -683,24 +683,56 @@ class ExcelManager:
                             estado = 'libre'
                             nodo_recepcion = None
                     
-                    # Determinar el estado del bloque basado en las columnas de estado
-                    # Priorizamos el estado más avanzado
-                    estados = []
-                    if COL_DIPLOMA < len(row) and not pd.isna(row[COL_DIPLOMA]) and row[COL_DIPLOMA] == 1:
-                        estados.append('diploma_entregado')
-                    if COL_RECIBIDO < len(row) and not pd.isna(row[COL_RECIBIDO]) and row[COL_RECIBIDO] == 1:
-                        estados.append('recibido_m3d')
-                    if COL_ENTREGADO < len(row) and not pd.isna(row[COL_ENTREGADO]) and row[COL_ENTREGADO] == 1:
-                        estados.append('entregado_nodo')
-                    if COL_VALIDACION < len(row) and not pd.isna(row[COL_VALIDACION]) and row[COL_VALIDACION] == 1:
-                        estados.append('validacion')
+                    # CORRECCIÓN: Solo procesar estados si hay un suscriptor válido
                     
-                    # Seleccionar el estado más avanzado si existe
-                    if estados:
-                        # Orden de prioridad: diploma_entregado > recibido_m3d > entregado_nodo > validacion > asignado > libre
-                        orden_estados = ['libre', 'asignado', 'validacion', 'entregado_nodo', 'recibido_m3d', 'diploma_entregado']
-                        estado = max(estados, key=lambda x: orden_estados.index(x))
-                    
+                    if suscriptor:
+                        # Determinar el estado del bloque basado en las columnas de estado
+                        # Primero, vamos a imprimir los valores para diagnóstico
+                        self.log(f"Fila {idx+1}: Valores de estado - "
+                                f"VALIDA FOTO: {row[COL_VALIDACION] if COL_VALIDACION < len(row) else 'NA'}, "
+                                f"anoto nodo: {row[COL_ENTREGADO] if COL_ENTREGADO < len(row) else 'NA'}, "
+                                f"RECIBIMOS: {row[COL_RECIBIDO] if COL_RECIBIDO < len(row) else 'NA'}, "
+                                f"Diploma OK: {row[COL_DIPLOMA] if COL_DIPLOMA < len(row) else 'NA'}", 'info')
+                        
+                        # Vamos a usar una lógica mejorada para detectar estados
+                        estados = []
+                        
+                        # Para el diploma, vamos a aceptar prácticamente cualquier valor no nulo y que no sea explícitamente negativo
+                        if COL_DIPLOMA < len(row) and not pd.isna(row[COL_DIPLOMA]):
+                            valor_diploma = str(row[COL_DIPLOMA]).strip().lower()
+                            if valor_diploma and valor_diploma not in ['0', 'nan', 'false', 'no']:
+                                estados.append('diploma_entregado')
+                        
+                        # Para recibidos, igual
+                        if COL_RECIBIDO < len(row) and not pd.isna(row[COL_RECIBIDO]):
+                            valor_recibido = str(row[COL_RECIBIDO]).strip().lower()
+                            if valor_recibido and valor_recibido not in ['0', 'nan', 'false', 'no']:
+                                estados.append('recibido_m3d')
+                        
+                        # Para entregado en nodo
+                        if COL_ENTREGADO < len(row) and not pd.isna(row[COL_ENTREGADO]):
+                            valor_entregado = str(row[COL_ENTREGADO]).strip().lower()
+                            if valor_entregado and valor_entregado not in ['0', 'nan', 'false', 'no']:
+                                estados.append('entregado_nodo')
+                        
+                        # Para validación
+                        if COL_VALIDACION < len(row) and not pd.isna(row[COL_VALIDACION]):
+                            valor_validacion = str(row[COL_VALIDACION]).strip().lower()
+                            if valor_validacion and valor_validacion not in ['0', 'nan', 'false', 'no']:
+                                estados.append('validacion')
+                        
+                        # Seleccionar el estado más avanzado si existe
+                        if estados:
+                            # Orden de prioridad: diploma_entregado > recibido_m3d > entregado_nodo > validacion > asignado > libre
+                            orden_estados = ['libre', 'asignado', 'validacion', 'entregado_nodo', 'recibido_m3d', 'diploma_entregado']
+                            estado = max(estados, key=lambda x: orden_estados.index(x))
+                        
+                        # Logging para diagnóstico
+                        self.log(f"Fila {idx+1}: Estados detectados: {estados}, estado final: {estado}", 'debug')
+
+
+
+
                     # Preparar datos del bloque
                     bloque_data = {
                         'numero_bloque': numero_bloque,
