@@ -578,6 +578,7 @@ class ExcelManager:
         self.log(f"Total de suscriptores creados automáticamente: {suscriptores_creados}", 'info')
         return registros_creados, registros_con_error
     
+    #El excel mas importante, el de los bloques y participantes
     @transaction.atomic
     def import_bloques_participantes(self, file_path, sheet_name=0):
         """
