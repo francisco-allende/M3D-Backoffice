@@ -1,4 +1,0 @@
-A menos que lo pida, no me pases el codigo del archivo completo cuando se trata de una simple modificación o agregar algo nuevo
-cada archivo nuevo, poneme en un comentario en file path
-si no entendes algo, antes de pasar codigo, pregúntame
-contesta en español
