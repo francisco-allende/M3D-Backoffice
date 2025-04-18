@@ -19,4 +19,7 @@ py manage.py import_excel --file='C:\Users\fallende\Desktop\M3D\M3D-Backoffice\a
 #Importar subs que faltaban
 python manage.py importar_suscriptores_faltantes --file='C:\Users\fallende\Desktop\M3D\M3D-Backoffice\assets\Participantes MALVINAS3D.xlsx'
 
+#Contador de estados del main Excel de subs y bloques
+python manage.py contar_valores_fotos_validadas --file='C:\Users\fallende\Desktop\M3D\M3D-Backoffice\assets\Participantes MALVINAS3D.xlsx'
+
 
