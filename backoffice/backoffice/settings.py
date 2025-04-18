@@ -171,8 +171,8 @@ JAZZMIN_SETTINGS = {
     # Título en el index
     "site_brand": "Malvinas 3D",
     # Logo del sitio
-    "site_logo": "img/logo-malvinas.png",  # Ruta relativa a STATIC_URL
-    "site_icon": "img/logo-malvinas.png", 
+    "site_logo": "img/m.png",  # Ruta relativa a STATIC_URL
+    "site_icon": "img/m.png", 
     "welcome_sign": "Bienvenido al panel de administración de Malvinas 3D",
     # Copyright
     "copyright": "Malvinas 3D © 2025",
