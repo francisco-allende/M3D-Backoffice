@@ -1,28 +1,65 @@
-# Django
+# Django #
 *.log
 *.pot
 *.pyc
-*.pyo
-__pycache__
+__pycache__/
+local_settings.py
 db.sqlite3
-/static
-/media
+db.sqlite3-journal
+media
 
 # Environments
 .env
 .venv
 env/
 venv/
+ENV/
+env.bak/
+venv.bak/
 
-# IDEs
+# Static files
+static/
+staticfiles/
+# Specifically exclude Jazzmin static files
+jazzmin/
+*/jazzmin/
+**/jazzmin/
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# IDE specific files
+.idea/
 .vscode/
-.idea/
+*.swp
+*.swo
 
-# PyCharm
-.idea/
+# If you're using node.js/npm for frontend
+node_modules/
+package-lock.json
 
-# MacOS
-.DS_Store
+# Generated files
+.coverage
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+.pytest_cache/
 
 #Excels modificados
 ~$Participantes MALVINAS3D.xlsx
