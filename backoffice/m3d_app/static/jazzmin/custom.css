@@ -166,3 +166,9 @@ select {
   select option:hover {
     background-color: #f5f5f5;
   }
+
+  /* Texto total de resultados */
+  .small{
+      font-size: 20px; 
+      padding-left: 25px;
+  }

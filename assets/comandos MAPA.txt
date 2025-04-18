@@ -1,0 +1,9 @@
+#MAPA MALVINAS CONTAR
+python manage.py analizar_poster_m3d --file='C:\Users\fallende\Desktop\M3D\M3D-Backoffice\assets\POSTER Secciones y textos MALVINAS3D.xlsx'
+
+#MAPA MALVINAS GUARDAR EN DB BLOQUES ESTATICOS
+python manage.py importar_mapa_bloques --file='C:\Users\fallende\Desktop\M3D\M3D-Backoffice\assets\POSTER Secciones y textos MALVINAS3D.xlsx'
+
+#MAPA MALVINAS ASIGNAR TIPOS 
+python manage.py asignar_tipos_bloques --file='C:\Users\fallende\Desktop\M3D\M3D-Backoffice\assets\POSTER Secciones y textos MALVINAS3D.xlsx'
+

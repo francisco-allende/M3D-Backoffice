@@ -194,6 +194,7 @@ JAZZMIN_SETTINGS = {
         "m3d_app.institucionsinimpresora": "fas fa-university",
         "auth.user": "fas fa-user-shield",
         "auth.group": "fas fa-users-cog",
+        "mapa_malvinas.mapabloque": "fas fa-map-marked-alt", 
     },
     # Tema oscuro para que los íconos se vean en blanco
     "theme": "darkly",
@@ -229,6 +230,7 @@ JAZZMIN_SETTINGS = {
     "order_with_respect_to": [
         "m3d_app.suscriptor", 
         "m3d_app.bloque", 
+        "mapa_malvinas.mapabloque", 
         "m3d_app.nodorecepcion",
         "m3d_app.impresora",
         "m3d_app.particularconimpresora",

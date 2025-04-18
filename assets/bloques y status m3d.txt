@@ -1,0 +1,14 @@
+cada sección tiene 25 bloques y son 60 secciones (osea, 10 columnas por 6 filas) M3D sección - numero (ej: M3D 05 - 20 es la sección 5, nro 20)
+
+estados (sucesivos):
+
+libre //no se le entrego a nadie
+asignado //a un suscriptor
+foto de validación //el subs imprimio y mando una foto de validación
+bloque entregado en el nodo //en el nodo de recepción
+bloque recibido en m3d 
+bloque recibido en m3d y diploma entregado
+
+ordenar a partir de los bloques
+
+las instituciones tienen tres bloques

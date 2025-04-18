@@ -23,3 +23,4 @@ python manage.py importar_suscriptores_faltantes --file='C:\Users\fallende\Deskt
 python manage.py contar_valores_fotos_validadas --file='C:\Users\fallende\Desktop\M3D\M3D-Backoffice\assets\Participantes MALVINAS3D.xlsx'
 
 
+

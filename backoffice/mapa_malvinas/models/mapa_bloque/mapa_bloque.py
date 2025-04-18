@@ -1,3 +1,5 @@
+# mapa_malvinas/models/mapa_bloque/mapa_bloque.py
+
 from django.db import models
 from ..choices.tipo_bloque import TipoBloque
 
