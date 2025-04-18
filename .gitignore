@@ -25,6 +25,9 @@ jazzmin/
 */jazzmin/
 **/jazzmin/
 
+# Pero incluir específicamente el archivo custom.css
+!backoffice/m3d_app/static/jazzmin/custom.css
+
 # Distribution / packaging
 .Python
 build/
