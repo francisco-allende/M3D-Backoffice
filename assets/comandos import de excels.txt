@@ -1,0 +1,25 @@
+# Importar particulares con impresora
+python manage.py import_excel --file="C:\\Users\\fallende\\Desktop\\M3D\\M3D-Backoffice\\assets\\form-particulares-con-impresora.xlsx" --type=particulares_con_impresora
+
+# Importar particulares sin impresora
+python manage.py import_excel --file="C:\\Users\\fallende\\Desktop\\M3D\\M3D-Backoffice\\assets\\form-particulares-sin-impresora.xlsx" --type=particulares_sin_impresora
+
+# Importar instituciones con impresora
+python manage.py import_excel --file="C:\\Users\\fallende\\Desktop\\M3D\\M3D-Backoffice\\assets\\form-instituciones-con-impresora.xlsx" --type=instituciones_con_impresora
+
+# Importar instituciones sin impresora
+python manage.py import_excel --file="C:\\Users\\fallende\\Desktop\\M3D\\M3D-Backoffice\\assets\\form-instituciones-sin-impresora.xlsx" --type=instituciones_sin_impresora
+
+#Importar nodos de recepción
+py manage.py import_excel --file='C:\Users\fallende\Desktop\M3D\M3D-Backoffice\assets\nodos-de-recepcion.xlsx' --type=nodos_recepcion
+
+#Importar bloques. nombre confuso. Excel mas importante.
+py manage.py import_excel --file='C:\Users\fallende\Desktop\M3D\M3D-Backoffice\assets\Participantes MALVINAS3D.xlsx' --type=bloques_participantes
+
+#Importar subs que faltaban
+python manage.py importar_suscriptores_faltantes --file='C:\Users\fallende\Desktop\M3D\M3D-Backoffice\assets\Participantes MALVINAS3D.xlsx'
+
+#Contador de estados del main Excel de subs y bloques
+python manage.py contar_valores_fotos_validadas --file='C:\Users\fallende\Desktop\M3D\M3D-Backoffice\assets\Participantes MALVINAS3D.xlsx'
+
+

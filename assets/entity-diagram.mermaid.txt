@@ -1,0 +1,83 @@
+classDiagram
+    class Suscriptor {
+        +CharField nombre
+        +CharField apellido
+        +CharField nombre_institucion
+        +EmailField email
+        +CharField telefono
+        +DateTimeField fecha_registro
+        +CharField tipo
+        +BooleanField foto_validada
+        +BooleanField diploma_entregado
+    }
+
+    class Impresora {
+        +IntegerField anios_experiencia
+        +TextField marcas_modelos_equipos
+        +IntegerField cantidad_equipos
+    }
+
+    class ParticularConImpresora {
+        +OneToOneField suscriptor
+        +OneToOneField impresora
+    }
+
+    class ParticularSinImpresora {
+        +OneToOneField suscriptor
+    }
+
+    class InstitucionConImpresora {
+        +OneToOneField suscriptor
+        +OneToOneField impresora
+        +CharField nombre_responsable
+    }
+
+    class InstitucionSinImpresora {
+        +OneToOneField suscriptor
+        +CharField nombre_responsable
+    }
+
+    class NodoRecepcion {
+        +ForeignKey suscriptor
+        +CharField numero_bloque
+        +CharField provincia
+        +CharField nodo_seleccionado
+    }
+
+    class Bloque {
+        +CharField numero_bloque
+        +CharField seccion
+        +CharField numero
+        +ForeignKey suscriptor
+        +ForeignKey nodo_recepcion
+        +CharField estado
+        +DateTimeField fecha_asignacion
+        +DateTimeField fecha_validacion
+        +DateTimeField fecha_entrega_nodo
+        +DateTimeField fecha_recepcion_m3d
+        +DateTimeField fecha_entrega_diploma
+    }
+    
+    class MapaBloque {
+        +CharField codigo
+        +CharField seccion
+        +CharField numero
+        +CharField numero_bloque
+        +TextField descripcion
+        +CharField tipo
+    }
+
+    Suscriptor <|-- ParticularConImpresora : OneToOne
+    Suscriptor <|-- ParticularSinImpresora : OneToOne
+    Suscriptor <|-- InstitucionConImpresora : OneToOne
+    Suscriptor <|-- InstitucionSinImpresora : OneToOne
+    
+    Impresora <|-- ParticularConImpresora : OneToOne
+    Impresora <|-- InstitucionConImpresora : OneToOne
+    
+    Suscriptor <|-- NodoRecepcion : ForeignKey
+    Suscriptor <|-- Bloque : ForeignKey
+    
+    NodoRecepcion <|-- Bloque : ForeignKey
+    
+    Bloque .. MapaBloque : Relación lógica\npor numero_bloque
