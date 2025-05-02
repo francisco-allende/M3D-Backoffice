@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-dlfjc5^wg)x@k$xq524hp9lf0c=gsgg@^hs_2h!=vta0wxy9oc
 # SECURITY WARNING: don't run with debug turned on in production!
 #PROD
 DEBUG = False
-ALLOWED_HOSTS = ['malvinas3d-backoffice.com.ar', 'backoffice.malvinas3d.com.ar', 'malvinas3d.pythonanywhere.com', 'backoffice.malvinas3d.pythonanywhere.com']
+ALLOWED_HOSTS = ['malvinas3d-backoffice.com.ar', 'backoffice.malvinas3d.com.ar', 'pichonero.pythonanywhere.com']
 
 #DEV
 #DEBUG = True
