@@ -37,7 +37,7 @@ ALLOWED_HOSTS = ['malvinas3d-backoffice.com.ar', 'backoffice.malvinas3d.com.ar',
 INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
-    'drf_yasg',
+    #'drf_yasg',
     'admin_interface',
     'colorfield',
     'jazzmin', 
