@@ -10,3 +10,4 @@ class Impresora(models.Model):
 
     def __str__(self):
         return f"{self.marcas_modelos_equipos} ({self.cantidad_equipos} equipos)"
+

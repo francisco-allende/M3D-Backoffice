@@ -24,10 +24,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-dlfjc5^wg)x@k$xq524hp9lf0c=gsgg@^hs_2h!=vta0wxy9oc'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+#PROD
+DEBUG = False
+ALLOWED_HOSTS = ['malvinas3d-backoffice.com.ar', 'backoffice.malvinas3d.com.ar', 'malvinas3d.pythonanywhere.com', 'backoffice.malvinas3d.pythonanywhere.com']
 
-ALLOWED_HOSTS = []
-
+#DEV
+#DEBUG = True
+#ALLOWED_HOSTS = []
 
 # Application definition
 
