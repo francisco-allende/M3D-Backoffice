@@ -1,63 +1,76 @@
-<!-- mapa_malvinas/templates/mapa_malvinas/mapa_bloques.html -->
-{% extends "admin/base_site.html" %} {% load static %} {% block extrastyle %} {{
-block.super }}
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
 <style>
   .mapa-container {
     position: relative;
     width: 100%;
     overflow-x: auto;
-    background-color: #f0f8ff;
+    background-color: #f8f9fa;
     padding: 20px;
     border-radius: 5px;
   }
 
-  .mapa-background {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 80%;
-    z-index: 0;
-    opacity: 0.3;
-  }
-
   .mapa-grid {
-    position: relative;
-    z-index: 1;
     display: flex;
     flex-direction: column;
+    gap: 20px;
   }
 
   .mapa-fila {
     display: flex;
-    margin-bottom: 5px;
+    gap: 20px;
   }
 
   .mapa-seccion {
-    margin-right: 5px;
+    margin-bottom: 30px;
+  }
+
+  .seccion-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    text-align: center;
   }
 
   .mapa-bloque-container {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .mapa-bloque-row {
-    display: flex;
-    margin-bottom: 2px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
   }
 
   .mapa-bloque {
-    width: 20px;
-    height: 20px;
-    margin-right: 2px;
+    width: 200px;
+    height: 200px;
     border: 1px solid #333;
-    font-size: 8px;
-    text-align: center;
+    overflow: auto;
+    padding: 10px;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
+    flex-direction: column;
+    font-size: 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .mapa-bloque:hover {
+    transform: scale(1.02);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    z-index: 5;
+  }
+
+  .bloque-codigo {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 5px;
+  }
+
+  .bloque-descripcion {
+    flex-grow: 1;
+    overflow: auto;
+    line-height: 1.3;
   }
 
   .estado-libre {
@@ -74,34 +87,23 @@ block.super }}
   }
   .estado-recibido_m3d {
     background-color: #4682b4;
+    color: white;
   }
   .estado-diploma_entregado {
     background-color: #32cd32;
   }
 
-  .tooltip {
-    position: absolute;
-    background-color: white;
-    border: 1px solid #333;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    z-index: 10;
-    max-width: 300px;
-    display: none;
-  }
-
   .mapa-leyenda {
-    margin-top: 20px;
+    margin: 20px 0;
     display: flex;
     flex-wrap: wrap;
+    gap: 15px;
   }
 
   .leyenda-item {
     display: flex;
     align-items: center;
     margin-right: 20px;
-    margin-bottom: 10px;
   }
 
   .leyenda-color {
@@ -110,14 +112,48 @@ block.super }}
     margin-right: 5px;
     border: 1px solid #333;
   }
+
+  /* Barra de navegación para secciones */
+  .nav-secciones {
+    position: sticky;
+    top: 0;
+    background: #fff;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    z-index: 10;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .nav-seccion-btn {
+    padding: 5px 10px;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .nav-seccion-btn:hover {
+    background: #e0e0e0;
+  }
+
+  /* Estilos específicos para mayúsculas (bloques GEOGRÁFICOS) */
+  .texto-mayusculas {
+    text-transform: uppercase;
+    font-weight: bold;
+  }
 </style>
-{% endblock %} {% block content %}
+{% endblock %}
+
+{% block content %}
 <div class="mapa-container">
   <h1>Mapa de Bloques Malvinas 3D</h1>
   <p>Total de bloques: {{ total_bloques }}</p>
 
   <div class="mapa-leyenda">
-    <h3>Leyenda:</h3>
+    <h3>Estados de los bloques:</h3>
     <div class="leyenda-item">
       <div class="leyenda-color estado-libre"></div>
       <span>Libre</span>
@@ -144,33 +180,28 @@ block.super }}
     </div>
   </div>
 
-  <img
-    src="{% static 'img/malvinas_mapa.png' %}"
-    class="mapa-background"
-    alt="Mapa de Malvinas"
-  />
+  <!-- Navegación de secciones -->
+  <div class="nav-secciones">
+    <strong>Ir a Sección: </strong>
+    {% for i in "12345678"|make_list %}{% for j in "01234"|make_list %}
+    <a href="#seccion-{{ j }}{{ i }}" class="nav-seccion-btn">{{ j }}{{ i }}</a>
+    {% endfor %}{% endfor %}
+  </div>
 
   <div class="mapa-grid">
     {% for fila_secciones in filas %}
     <div class="mapa-fila">
       {% for seccion_data in fila_secciones %}
-      <div class="mapa-seccion">
-        <h4>Sección {{ seccion_data.seccion }}</h4>
+      <div class="mapa-seccion" id="seccion-{{ seccion_data.seccion }}">
+        <div class="seccion-title">Sección {{ seccion_data.seccion }}</div>
         <div class="mapa-bloque-container">
           {% for fila_num, bloques in seccion_data.filas_bloques.items %}
-          <div class="mapa-bloque-row">
             {% for bloque in bloques %}
-            <div
-              class="mapa-bloque estado-{{ bloque.estado }}"
-              data-codigo="{{ bloque.codigo }}"
-              data-descripcion="{{ bloque.descripcion }}"
-              data-tipo="{{ bloque.tipo }}"
-              data-estado="{{ bloque.estado }}"
-            >
-              {{ bloque.numero }}
+            <div class="mapa-bloque estado-{{ bloque.estado }}">
+              <div class="bloque-codigo">{{ bloque.codigo }}</div>
+              <div class="bloque-descripcion {% if bloque.tipo == 'Geográfico' %}texto-mayusculas{% endif %}">{{ bloque.descripcion }}</div>
             </div>
             {% endfor %}
-          </div>
           {% endfor %}
         </div>
       </div>
@@ -178,38 +209,5 @@ block.super }}
     </div>
     {% endfor %}
   </div>
-
-  <div id="tooltip" class="tooltip"></div>
 </div>
-
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const bloques = document.querySelectorAll(".mapa-bloque");
-    const tooltip = document.getElementById("tooltip");
-
-    bloques.forEach((bloque) => {
-      bloque.addEventListener("mouseover", function (e) {
-        const codigo = this.getAttribute("data-codigo");
-        const descripcion = this.getAttribute("data-descripcion");
-        const tipo = this.getAttribute("data-tipo");
-        const estado = this.getAttribute("data-estado");
-
-        tooltip.innerHTML = `
-          <strong>${codigo}</strong><br>
-          <p>${descripcion}</p>
-          <p><strong>Tipo:</strong> ${tipo || "No definido"}</p>
-          <p><strong>Estado:</strong> ${estado}</p>
-        `;
-
-        tooltip.style.left = e.pageX + 10 + "px";
-        tooltip.style.top = e.pageY + 10 + "px";
-        tooltip.style.display = "block";
-      });
-
-      bloque.addEventListener("mouseout", function () {
-        tooltip.style.display = "none";
-      });
-    });
-  });
-</script>
 {% endblock %}
