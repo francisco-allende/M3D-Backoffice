@@ -25,12 +25,12 @@ SECRET_KEY = 'django-insecure-dlfjc5^wg)x@k$xq524hp9lf0c=gsgg@^hs_2h!=vta0wxy9oc
 
 # SECURITY WARNING: don't run with debug turned on in production!
 #PROD
-DEBUG = False
-ALLOWED_HOSTS = ['malvinas3d-backoffice.com.ar', 'backoffice.malvinas3d.com.ar', 'pichonero.pythonanywhere.com']
+#DEBUG = False
+#ALLOWED_HOSTS = ['malvinas3d-backoffice.com.ar', 'backoffice.malvinas3d.com.ar', 'pichonero.pythonanywhere.com']
 
 #DEV
-#DEBUG = True
-#ALLOWED_HOSTS = []
+DEBUG = True
+ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -180,9 +180,9 @@ JAZZMIN_SETTINGS = {
     # Copyright
     "copyright": "Malvinas 3D © 2025",
     # Enlaces en el menú superior
-    "topmenu_links": [
+        "topmenu_links": [
         {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
-        # Cambiado para redirigir a malvinas3d.com.ar
+        {"name": "Mapa de Bloques", "url": "mapa_malvinas:mapa_bloques", "permissions": ["auth.view_user"]},
         {"name": "Vista del sitio", "url": "https://malvinas3d.com.ar/", "new_window": True},
     ],
     # Íconos personalizados - asegurar que todos los íconos de la barra lateral sean blancos

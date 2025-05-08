@@ -49,5 +49,7 @@ urlpatterns = [
     # Incluir URLs de autenticación para el navegador API
     path('api-auth/', include('rest_framework.urls')),
     # Tu URL existente
-    path('my_view/', my_view)
+    path('my_view/', my_view),
+    #Mapa
+    path('mapa/', include('mapa_malvinas.urls')),
 ]

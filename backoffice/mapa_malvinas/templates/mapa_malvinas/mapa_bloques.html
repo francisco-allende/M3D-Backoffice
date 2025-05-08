@@ -1,0 +1,215 @@
+<!-- mapa_malvinas/templates/mapa_malvinas/mapa_bloques.html -->
+{% extends "admin/base_site.html" %} {% load static %} {% block extrastyle %} {{
+block.super }}
+<style>
+  .mapa-container {
+    position: relative;
+    width: 100%;
+    overflow-x: auto;
+    background-color: #f0f8ff;
+    padding: 20px;
+    border-radius: 5px;
+  }
+
+  .mapa-background {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80%;
+    z-index: 0;
+    opacity: 0.3;
+  }
+
+  .mapa-grid {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mapa-fila {
+    display: flex;
+    margin-bottom: 5px;
+  }
+
+  .mapa-seccion {
+    margin-right: 5px;
+  }
+
+  .mapa-bloque-container {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mapa-bloque-row {
+    display: flex;
+    margin-bottom: 2px;
+  }
+
+  .mapa-bloque {
+    width: 20px;
+    height: 20px;
+    margin-right: 2px;
+    border: 1px solid #333;
+    font-size: 8px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .estado-libre {
+    background-color: white;
+  }
+  .estado-asignado {
+    background-color: #ffd700;
+  }
+  .estado-validacion {
+    background-color: #ffa500;
+  }
+  .estado-entregado_nodo {
+    background-color: #87ceeb;
+  }
+  .estado-recibido_m3d {
+    background-color: #4682b4;
+  }
+  .estado-diploma_entregado {
+    background-color: #32cd32;
+  }
+
+  .tooltip {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #333;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    max-width: 300px;
+    display: none;
+  }
+
+  .mapa-leyenda {
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .leyenda-item {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+    margin-bottom: 10px;
+  }
+
+  .leyenda-color {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    border: 1px solid #333;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="mapa-container">
+  <h1>Mapa de Bloques Malvinas 3D</h1>
+  <p>Total de bloques: {{ total_bloques }}</p>
+
+  <div class="mapa-leyenda">
+    <h3>Leyenda:</h3>
+    <div class="leyenda-item">
+      <div class="leyenda-color estado-libre"></div>
+      <span>Libre</span>
+    </div>
+    <div class="leyenda-item">
+      <div class="leyenda-color estado-asignado"></div>
+      <span>Asignado</span>
+    </div>
+    <div class="leyenda-item">
+      <div class="leyenda-color estado-validacion"></div>
+      <span>Foto de validación</span>
+    </div>
+    <div class="leyenda-item">
+      <div class="leyenda-color estado-entregado_nodo"></div>
+      <span>Entregado en nodo</span>
+    </div>
+    <div class="leyenda-item">
+      <div class="leyenda-color estado-recibido_m3d"></div>
+      <span>Recibido en M3D</span>
+    </div>
+    <div class="leyenda-item">
+      <div class="leyenda-color estado-diploma_entregado"></div>
+      <span>Diploma entregado</span>
+    </div>
+  </div>
+
+  <img
+    src="{% static 'img/malvinas_mapa.png' %}"
+    class="mapa-background"
+    alt="Mapa de Malvinas"
+  />
+
+  <div class="mapa-grid">
+    {% for fila_secciones in filas %}
+    <div class="mapa-fila">
+      {% for seccion_data in fila_secciones %}
+      <div class="mapa-seccion">
+        <h4>Sección {{ seccion_data.seccion }}</h4>
+        <div class="mapa-bloque-container">
+          {% for fila_num, bloques in seccion_data.filas_bloques.items %}
+          <div class="mapa-bloque-row">
+            {% for bloque in bloques %}
+            <div
+              class="mapa-bloque estado-{{ bloque.estado }}"
+              data-codigo="{{ bloque.codigo }}"
+              data-descripcion="{{ bloque.descripcion }}"
+              data-tipo="{{ bloque.tipo }}"
+              data-estado="{{ bloque.estado }}"
+            >
+              {{ bloque.numero }}
+            </div>
+            {% endfor %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <div id="tooltip" class="tooltip"></div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const bloques = document.querySelectorAll(".mapa-bloque");
+    const tooltip = document.getElementById("tooltip");
+
+    bloques.forEach((bloque) => {
+      bloque.addEventListener("mouseover", function (e) {
+        const codigo = this.getAttribute("data-codigo");
+        const descripcion = this.getAttribute("data-descripcion");
+        const tipo = this.getAttribute("data-tipo");
+        const estado = this.getAttribute("data-estado");
+
+        tooltip.innerHTML = `
+          <strong>${codigo}</strong><br>
+          <p>${descripcion}</p>
+          <p><strong>Tipo:</strong> ${tipo || "No definido"}</p>
+          <p><strong>Estado:</strong> ${estado}</p>
+        `;
+
+        tooltip.style.left = e.pageX + 10 + "px";
+        tooltip.style.top = e.pageY + 10 + "px";
+        tooltip.style.display = "block";
+      });
+
+      bloque.addEventListener("mouseout", function () {
+        tooltip.style.display = "none";
+      });
+    });
+  });
+</script>
+{% endblock %}
