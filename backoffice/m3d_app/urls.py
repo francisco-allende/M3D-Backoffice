@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.shortcuts import redirect
 from django.urls import path, include
 from rest_framework import routers
 from m3d_app.views import (
@@ -28,6 +29,7 @@ router.register(r'suscriptores-con-bloques', SuscriptorConBloquesViewSet, basena
 
 
 urlpatterns = [
+    path('', lambda request: redirect('/admin/', permanent=True)), 
     path('admin/', admin.site.urls),
     # Incluir las URLs de la API
     path('api/', include(router.urls)),
