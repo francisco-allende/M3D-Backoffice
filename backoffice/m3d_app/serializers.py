@@ -52,6 +52,14 @@ class BloqueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bloque
         fields = '__all__'
+
+        def get_numero_bloque_display(self, obj):
+            """
+            Devuelve el número de bloque con la leyenda (sin impresora) para secciones 32, 33 y 34
+            """
+            if obj.seccion in ['*32', '*33', '*34']:
+                return f"{obj.numero_bloque} (sin impresora)"
+            return obj.numero_bloque
         
 class NodoRecepcionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -61,7 +69,15 @@ class NodoRecepcionSerializer(serializers.ModelSerializer):
 class BloqueResumidoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bloque
-        fields = ['id', 'numero_bloque', 'seccion', 'numero', 'estado']
+        fields = ['id', 'numero_bloque', 'seccion', 'numero', 'estado', 'nro_sorteo']
+
+        def get_numero_bloque_display(self, obj):
+            """
+            Devuelve el número de bloque con la leyenda (sin impresora) para secciones 32, 33 y 34
+            """
+            if obj.seccion in ['*32', '*33', '*34']:
+                return f"{obj.numero_bloque} (sin impresora)"
+            return obj.numero_bloque
 
 class SuscriptorConBloquesSerializer(serializers.ModelSerializer):
     bloques = BloqueResumidoSerializer(many=True, read_only=True)

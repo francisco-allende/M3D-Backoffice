@@ -38,6 +38,7 @@ class ExcelManagerForBloques(ExcelManagerBase):
         # Identificar columnas relevantes
         col_bloque = self.find_column(df, ['bloque'])
         col_email = self.find_column(df, ['mail', 'email', 'correo'])
+        col_nro_sorteo = self.find_column(df, ['n sorteo', 'sorteo', 'numero sorteo'])  # ¡NUEVO!
         col_validacion = self.find_column(df, ['valida foto', 'validacion', 'foto'])
         col_entregado = self.find_column(df, ['anoto nodo', 'entregado', 'nodo'])
         col_recibido = self.find_column(df, ['recibimos', 'recibido'])
@@ -63,6 +64,10 @@ class ExcelManagerForBloques(ExcelManagerBase):
             return 0, 0, 0
             
         self.log(f"Columnas identificadas: bloque={col_bloque}, email={col_email}", 'info')
+        if col_nro_sorteo:
+            self.log(f"Columna nro_sorteo encontrada: {col_nro_sorteo}", 'info')
+        else:
+            self.log("Columna nro_sorteo no encontrada", 'warning')
         self.log(f"Estados encontrados: {', '.join(estados_encontrados)}", 'info')
         
         # Definir la jerarquía de estados
@@ -76,7 +81,7 @@ class ExcelManagerForBloques(ExcelManagerBase):
         }
         
         # Preparar estructuras de datos
-        bloques_info = {}  # Almacenará {numero_bloque: {email, estado_maximal}}
+        bloques_info = {}  # Almacenará {numero_bloque: {email, estado_maximal, nro_sorteo}}
         ultima_institucion_email = None
         bloques_institucion = []
         
@@ -88,6 +93,12 @@ class ExcelManagerForBloques(ExcelManagerBase):
                     continue
                     
                 numero_bloque = str(row[col_bloque]).strip()
+                
+                # Obtener número de sorteo ¡NUEVO!
+                nro_sorteo = None
+                if col_nro_sorteo and not pd.isna(row[col_nro_sorteo]):
+                    nro_sorteo = str(row[col_nro_sorteo]).strip()
+                    self.log(f"Fila {idx+1}: Número de sorteo encontrado: '{nro_sorteo}' para bloque {numero_bloque}", 'info')
                 
                 # Obtener email del suscriptor
                 email_suscriptor = None
@@ -106,7 +117,8 @@ class ExcelManagerForBloques(ExcelManagerBase):
                         self.log(f"Fila {idx+1}: No hay email, bloque libre", 'info')
                         bloques_info[numero_bloque] = {
                             'email': None,
-                            'estado': 'libre'
+                            'estado': 'libre',
+                            'nro_sorteo': None  # ¡NUEVO! Los bloques libres no tienen número de sorteo
                         }
                         estados_count['libre'] += 1
                         continue
@@ -145,10 +157,11 @@ class ExcelManagerForBloques(ExcelManagerBase):
                     estado_maximal = 'validacion'
                     self.log(f"Fila {idx+1}: Estado validacion para bloque {numero_bloque}", 'info')
                 
-                # Guardar la información
+                # Guardar la información ¡MODIFICADO para incluir nro_sorteo!
                 bloques_info[numero_bloque] = {
                     'email': email_suscriptor,
-                    'estado': estado_maximal
+                    'estado': estado_maximal,
+                    'nro_sorteo': nro_sorteo  # ¡NUEVO!
                 }
                 
                 # Actualizar contadores
@@ -177,6 +190,7 @@ class ExcelManagerForBloques(ExcelManagerBase):
                             defaults={
                                 'suscriptor': None,
                                 'estado': 'libre',
+                                'nro_sorteo': None,  # ¡NUEVO!
                                 'fecha_asignacion': None,
                                 'fecha_validacion': None,
                                 'fecha_entrega_nodo': None,
@@ -205,11 +219,12 @@ class ExcelManagerForBloques(ExcelManagerBase):
                     # Buscar el nodo asociado al suscriptor (si existe)
                     nodo_recepcion = NodoRecepcion.objects.filter(suscriptor=suscriptor).first()
                     
-                    # Preparar datos del bloque
+                    # Preparar datos del bloque ¡MODIFICADO para incluir nro_sorteo!
                     bloque_data = {
                         'suscriptor': suscriptor,
                         'nodo_recepcion': nodo_recepcion,
-                        'estado': info['estado']
+                        'estado': info['estado'],
+                        'nro_sorteo': info['nro_sorteo']  # ¡NUEVO!
                     }
                     
                     # Establecer fechas según el estado
@@ -242,10 +257,12 @@ class ExcelManagerForBloques(ExcelManagerBase):
                     
                     if created:
                         bloques_creados += 1
-                        self.log(f"Bloque {numero_bloque} creado con estado {info['estado']}", 'info')
+                        sorteo_msg = f" (nro_sorteo: {info['nro_sorteo']})" if info['nro_sorteo'] else ""
+                        self.log(f"Bloque {numero_bloque} creado con estado {info['estado']}{sorteo_msg}", 'info')
                     else:
                         bloques_actualizados += 1
-                        self.log(f"Bloque {numero_bloque} actualizado a estado {info['estado']}", 'info')
+                        sorteo_msg = f" (nro_sorteo: {info['nro_sorteo']})" if info['nro_sorteo'] else ""
+                        self.log(f"Bloque {numero_bloque} actualizado a estado {info['estado']}{sorteo_msg}", 'info')
                     
                 except Suscriptor.DoesNotExist:
                     bloques_con_error += 1
@@ -269,5 +286,12 @@ class ExcelManagerForBloques(ExcelManagerBase):
         self.log("\nEstado final en la base de datos:", 'info')
         for estado, count in estados_finales.items():
             self.log(f"  - {estado}: {count}", 'info')
+        
+        # ¡NUEVO! Mostrar estadísticas de números de sorteo
+        bloques_con_sorteo = Bloque.objects.filter(nro_sorteo__isnull=False).count()
+        bloques_sin_sorteo = Bloque.objects.filter(nro_sorteo__isnull=True).count()
+        self.log(f"\nEstadísticas de números de sorteo:", 'info')
+        self.log(f"  - Bloques con número de sorteo: {bloques_con_sorteo}", 'info')
+        self.log(f"  - Bloques sin número de sorteo: {bloques_sin_sorteo}", 'info')
         
         return bloques_creados, bloques_actualizados, bloques_con_error

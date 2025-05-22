@@ -175,7 +175,7 @@ class ExcelMapper:
     @staticmethod
     def columnas_bloque_participantes():
         return {
-            'N sorteo': 'numero_orden',                # Primera columna con números de identificación
+            'N sorteo': 'nro_sorteo',                # Primera columna con números de identificación
             'prefijo': 'prefijo_m3d',            # Columna con "M3D"
             'bloque': 'numero_bloque',           # Columna con número de bloque (ej: "10-12")
             'MAIL': 'email_suscriptor',            # Email para relacionar con el suscriptor

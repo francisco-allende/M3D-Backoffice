@@ -7,6 +7,8 @@ class Bloque(models.Model):
 
     # Formato "05-01" -> Sección 5, bloque 1
     numero_bloque = models.CharField(max_length=20, unique=True)
+    # Agregar esta línea después de numero_bloque
+    nro_sorteo = models.CharField(max_length=50, blank=True, null=True, help_text='Número de sorteo asignado cuando el bloque tiene un suscriptor')
     
     # Campo derivado de numero_bloque (ej: "05" para "05-01")
     seccion = models.CharField(max_length=10, db_index=True)
