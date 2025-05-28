@@ -15,6 +15,10 @@ class Bloque(models.Model):
     
     # Campo derivado de numero_bloque (ej: "01" para "05-01")
     numero = models.CharField(max_length=10, db_index=True)
+
+    class Meta:
+        verbose_name = "Admin Bloques"
+        verbose_name_plural = "Admin Bloques"
     
     suscriptor = models.ForeignKey(
         Suscriptor, 

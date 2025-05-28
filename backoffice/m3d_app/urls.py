@@ -29,7 +29,7 @@ router.register(r'suscriptores-con-bloques', SuscriptorConBloquesViewSet, basena
 
 
 urlpatterns = [
-    path('', lambda request: redirect('/admin/', permanent=True)), 
+    #path('', lambda request: redirect('/admin/', permanent=True)), 
     path('admin/', admin.site.urls),
     # Incluir las URLs de la API
     path('api/', include(router.urls)),

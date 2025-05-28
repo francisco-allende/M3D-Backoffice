@@ -185,6 +185,16 @@ JAZZMIN_SETTINGS = {
         {"name": "Mapa de Bloques", "url": "mapa_malvinas:mapa_bloques", "permissions": ["auth.view_user"]},
         {"name": "Vista del sitio", "url": "https://malvinas3d.com.ar/", "new_window": True},
     ],
+
+    "custom_links": {
+        "mapa_malvinas": [{
+            "name": "Mapa Bloques",
+            "url": "mapa_malvinas:mapa_bloques", 
+            "icon": "fas fa-map-marked-alt",
+            "permissions": ["auth.view_user"]
+        }]
+    },
+
     # Íconos personalizados - asegurar que todos los íconos de la barra lateral sean blancos
     "icons": {
         "m3d_app.suscriptor": "fas fa-users",
@@ -197,7 +207,7 @@ JAZZMIN_SETTINGS = {
         "m3d_app.institucionsinimpresora": "fas fa-university",
         "auth.user": "fas fa-user-shield",
         "auth.group": "fas fa-users-cog",
-        "mapa_malvinas.mapabloque": "fas fa-map-marked-alt", 
+        "mapa_malvinas.mapabloque": "fas fa-book", 
     },
     # Tema oscuro para que los íconos se vean en blanco
     "theme": "darkly",
@@ -241,6 +251,7 @@ JAZZMIN_SETTINGS = {
         "m3d_app.institucionconimpresora",
         "m3d_app.institucionsinimpresora",
     ],
+
     # CSS personalizado
     "custom_css": "jazzmin/custom.css",  # Crearemos este archivo
 }

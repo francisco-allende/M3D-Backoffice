@@ -23,6 +23,10 @@ class MapaBloque(models.Model):
         blank=True,
         null=True,
     )
+
+    class Meta:
+        verbose_name = "Historia Bloque"
+        verbose_name_plural = "Historia Bloques"
     
     def __str__(self):
         return f"{self.codigo} - {self.tipo}"

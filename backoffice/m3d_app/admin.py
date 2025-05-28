@@ -15,7 +15,7 @@ from django.http import HttpResponse
 
 # Clase para mejorar la visualización de Bloques en el admin
 class BloqueAdmin(admin.ModelAdmin):
-    list_display = ('numero_bloque_display','nro_sorteo',  'seccion', 'numero', 'suscriptor', 'estado', 'fecha_asignacion')
+    list_display = ('nro_sorteo', 'numero_bloque_display', 'seccion', 'numero', 'suscriptor', 'estado', 'fecha_asignacion')
     list_filter = ('seccion', 'estado')
     search_fields = ('nro_sorteo', 'numero_bloque', 'seccion', 'numero', 'suscriptor__nombre', 'suscriptor__nombre_institucion')
     readonly_fields = ('seccion', 'numero')
