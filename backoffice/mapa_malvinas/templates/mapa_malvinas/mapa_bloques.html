@@ -1,261 +1,11 @@
 {% extends "admin/base_site.html" %}
 {% load static %}
 
-/* backoffice/mapa_malvinas/templates/mapa_malvinas/mapa_bloques.html - Actualizar sección de estilos */
 
 {% block extrastyle %}
 {{ block.super }}
-<style>
-  .mapa-container {
-    position: relative;
-    width: 100%;
-    height: 150vh; /* Altura fija para el contenedor */
-    background-color: #f8f9fa;
-    padding: 20px;
-    border-radius: 5px;
-    display: flex;
-    flex-direction: column;
-  }
 
-  .mapa-scroll-container {
-    flex: 1;
-    overflow: auto;
-    border: 2px solid #dee2e6;
-    border-radius: 5px;
-    background: white;
-    /* Hacer que la scrollbar sea más visible */
-    scrollbar-width: thick;
-    scrollbar-color: #6c757d #f8f9fa;
-  }
-
-  /* Personalizar scrollbars para WebKit browsers (Chrome, Safari, Edge) */
-  .mapa-scroll-container::-webkit-scrollbar {
-    width: 16px;
-    height: 16px;
-  }
-
-  .mapa-scroll-container::-webkit-scrollbar-track {
-    background: #f8f9fa;
-    border-radius: 8px;
-  }
-
-  .mapa-scroll-container::-webkit-scrollbar-thumb {
-    background: #6c757d;
-    border-radius: 8px;
-    border: 2px solid #f8f9fa;
-  }
-
-  .mapa-scroll-container::-webkit-scrollbar-thumb:hover {
-    background: #495057;
-  }
-
-  /* Hacer que el scroll corner sea visible */
-  .mapa-scroll-container::-webkit-scrollbar-corner {
-    background: #f8f9fa;
-  }
-
-  .mapa-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    min-width: 2200px; /* Ancho mínimo para mostrar las 10 secciones */
-    padding: 20px;
-  }
-
-  .mapa-fila {
-    display: flex;
-    gap: 20px;
-  }
-
-  .mapa-seccion {
-    margin-bottom: 30px;
-  }
-
-  .seccion-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-    text-align: center;
-    position: sticky;
-    top: 0;
-    background: white;
-    z-index: 2;
-    padding: 5px;
-    border-radius: 3px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-
-  .mapa-bloque-container {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-  }
-
-  .mapa-bloque {
-    width: 200px;
-    height: 200px;
-    border: 1px solid #333;
-    overflow: auto;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    font-size: 12px;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-
-  .mapa-bloque:hover {
-    transform: scale(1.02);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    z-index: 5;
-  }
-
-  .bloque-codigo {
-    font-weight: bold;
-    font-size: 16px;
-    margin-bottom: 5px;
-    border-bottom: 1px solid #ccc;
-    padding-bottom: 5px;
-  }
-
-  .bloque-descripcion {
-    flex-grow: 1;
-    overflow: auto;
-    line-height: 1.3;
-  }
-
-  /* Estados de bloques */
-  .estado-libre {
-    background-color: white;
-  }
-  .estado-asignado {
-    background-color: #ffd700;
-  }
-  .estado-validacion {
-    background-color: #ffa500;
-  }
-  .estado-entregado_nodo {
-    background-color: #87ceeb;
-  }
-  .estado-recibido_m3d {
-    background-color: #4682b4;
-    color: white;
-  }
-  .estado-diploma_entregado {
-    background-color: #32cd32;
-  }
-
-  /* Leyenda fija en la parte superior */
-  .mapa-leyenda {
-    margin: 10px 0 20px 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    background: white;
-    padding: 15px;
-    border-radius: 5px;
-    border: 1px solid #dee2e6;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-  }
-
-  .leyenda-item {
-    display: flex;
-    align-items: center;
-    margin-right: 20px;
-  }
-
-  .leyenda-color {
-    width: 20px;
-    height: 20px;
-    margin-right: 5px;
-    border: 1px solid #333;
-  }
-
-  /* Barra de navegación para secciones - también fija */
-  .nav-secciones {
-    background: #fff;
-    padding: 15px;
-    border: 1px solid #dee2e6;
-    border-radius: 5px;
-    z-index: 10;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 10px;
-    position: sticky;
-    top: 0;
-  }
-
-  .nav-seccion-btn {
-    padding: 8px 12px;
-    background: #f0f0f0;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    cursor: pointer;
-    text-decoration: none;
-    color: #333;
-    font-size: 14px;
-    font-weight: bold;
-    transition: all 0.2s;
-  }
-
-  .nav-seccion-btn:hover {
-    background: #007bff;
-    color: white;
-    text-decoration: none;
-  }
-
-  /* Indicador de scroll */
-  .scroll-indicator {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(0,0,0,0.7);
-    color: white;
-    padding: 10px 15px;
-    border-radius: 20px;
-    font-size: 14px;
-    z-index: 1000;
-    display: none;
-  }
-
-  /* Estilos específicos para mayúsculas (bloques GEOGRÁFICOS) */
-  .texto-mayusculas {
-    text-transform: uppercase;
-    font-weight: bold;
-  }
-
-  /* Botones de navegación rápida */
-  .navegacion-rapida {
-    position: fixed;
-    top: 50%;
-    right: 20px;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 1000;
-  }
-
-  .nav-btn {
-    background: #007bff;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    font-size: 20px;
-    cursor: pointer;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-    transition: all 0.2s;
-  }
-
-  .nav-btn:hover {
-    background: #0056b3;
-    transform: scale(1.1);
-  }
-</style>
+<link rel="stylesheet" type="text/css" href="{% static 'mapa_malvinas/css/mapa_bloques.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -291,12 +41,69 @@
     </div>
   </div>
 
-  <!-- Navegación de secciones -->
+<!-- Navegación de secciones fija -->
   <div class="nav-secciones">
     <strong>Ir a Sección: </strong>
-    {% for i in "12345678"|make_list %}{% for j in "01234"|make_list %}
-    <a href="#seccion-{{ j }}{{ i }}" class="nav-seccion-btn">{{ j }}{{ i }}</a>
-    {% endfor %}{% endfor %}
+    <a href="#seccion-01" class="nav-seccion-btn">01</a>
+    <a href="#seccion-02" class="nav-seccion-btn">02</a>
+    <a href="#seccion-03" class="nav-seccion-btn">03</a>
+    <a href="#seccion-04" class="nav-seccion-btn">04</a>
+    <a href="#seccion-05" class="nav-seccion-btn">05</a>
+    <a href="#seccion-06" class="nav-seccion-btn">06</a>
+    <a href="#seccion-07" class="nav-seccion-btn">07</a>
+    <a href="#seccion-08" class="nav-seccion-btn">08</a>
+    <a href="#seccion-09" class="nav-seccion-btn">09</a>
+    <a href="#seccion-10" class="nav-seccion-btn">10</a>
+    <a href="#seccion-11" class="nav-seccion-btn">11</a>
+    <a href="#seccion-12" class="nav-seccion-btn">12</a>
+    <a href="#seccion-13" class="nav-seccion-btn">13</a>
+    <a href="#seccion-14" class="nav-seccion-btn">14</a>
+    <a href="#seccion-15" class="nav-seccion-btn">15</a>
+    <a href="#seccion-16" class="nav-seccion-btn">16</a>
+    <a href="#seccion-17" class="nav-seccion-btn">17</a>
+    <a href="#seccion-18" class="nav-seccion-btn">18</a>
+    <a href="#seccion-19" class="nav-seccion-btn">19</a>
+    <a href="#seccion-20" class="nav-seccion-btn">20</a>
+    <a href="#seccion-21" class="nav-seccion-btn">21</a>
+    <a href="#seccion-22" class="nav-seccion-btn">22</a>
+    <a href="#seccion-23" class="nav-seccion-btn">23</a>
+    <a href="#seccion-24" class="nav-seccion-btn">24</a>
+    <a href="#seccion-25" class="nav-seccion-btn">25</a>
+    <a href="#seccion-26" class="nav-seccion-btn">26</a>
+    <a href="#seccion-27" class="nav-seccion-btn">27</a>
+    <a href="#seccion-28" class="nav-seccion-btn">28</a>
+    <a href="#seccion-29" class="nav-seccion-btn">29</a>
+    <a href="#seccion-30" class="nav-seccion-btn">30</a>
+    <a href="#seccion-31" class="nav-seccion-btn">31</a>
+    <a href="#seccion-32" class="nav-seccion-btn">32</a>
+    <a href="#seccion-33" class="nav-seccion-btn">33</a>
+    <a href="#seccion-34" class="nav-seccion-btn">34</a>
+    <a href="#seccion-35" class="nav-seccion-btn">35</a>
+    <a href="#seccion-36" class="nav-seccion-btn">36</a>
+    <a href="#seccion-37" class="nav-seccion-btn">37</a>
+    <a href="#seccion-38" class="nav-seccion-btn">38</a>
+    <a href="#seccion-39" class="nav-seccion-btn">39</a>
+    <a href="#seccion-40" class="nav-seccion-btn">40</a>
+    <a href="#seccion-41" class="nav-seccion-btn">41</a>
+    <a href="#seccion-42" class="nav-seccion-btn">42</a>
+    <a href="#seccion-43" class="nav-seccion-btn">43</a>
+    <a href="#seccion-44" class="nav-seccion-btn">44</a>
+    <a href="#seccion-45" class="nav-seccion-btn">45</a>
+    <a href="#seccion-46" class="nav-seccion-btn">46</a>
+    <a href="#seccion-47" class="nav-seccion-btn">47</a>
+    <a href="#seccion-48" class="nav-seccion-btn">48</a>
+    <a href="#seccion-49" class="nav-seccion-btn">49</a>
+    <a href="#seccion-50" class="nav-seccion-btn">50</a>
+    <a href="#seccion-51" class="nav-seccion-btn">51</a>
+    <a href="#seccion-52" class="nav-seccion-btn">52</a>
+    <a href="#seccion-53" class="nav-seccion-btn">53</a>
+    <a href="#seccion-54" class="nav-seccion-btn">54</a>
+    <a href="#seccion-55" class="nav-seccion-btn">55</a>
+    <a href="#seccion-56" class="nav-seccion-btn">56</a>
+    <a href="#seccion-57" class="nav-seccion-btn">57</a>
+    <a href="#seccion-58" class="nav-seccion-btn">58</a>
+    <a href="#seccion-59" class="nav-seccion-btn">59</a>
+    <a href="#seccion-60" class="nav-seccion-btn">60</a>
   </div>
 
     <!-- Contenedor mapa con scroll -->
