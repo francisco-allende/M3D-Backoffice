@@ -1,9 +1,9 @@
-# mapa_malvinas/views.py
+# backoffice/mapa_malvinas/views.py
+
 from django.shortcuts import render
 from .models.mapa_bloque.mapa_bloque import MapaBloque
 from m3d_app.models.bloque3d.bloque import Bloque
 
-# mapa_malvinas/views.py (sin cambios en la lógica, solo se mantiene para referencia)
 def mapa_bloques(request):
     # Obtener todos los bloques del mapa
     mapa_bloques = MapaBloque.objects.all().order_by('seccion', 'numero')
@@ -37,13 +37,14 @@ def mapa_bloques(request):
             'estado': estado
         })
     
-    # Organizar las secciones en filas (5 secciones por fila para mejor visualización)
+    # Organizar las secciones en filas (10 secciones por fila para 6 filas total)
     filas = []
     secciones_ordenadas = sorted(secciones.keys())
     
-    for i in range(0, len(secciones_ordenadas), 5):
+    # Cambiar de 5 a 10 secciones por fila
+    for i in range(0, len(secciones_ordenadas), 10):
         fila_secciones = []
-        for seccion in secciones_ordenadas[i:i+5]:
+        for seccion in secciones_ordenadas[i:i+10]:
             fila_secciones.append({
                 'seccion': seccion,
                 'filas_bloques': secciones[seccion]

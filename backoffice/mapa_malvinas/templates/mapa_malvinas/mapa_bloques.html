@@ -1,22 +1,65 @@
 {% extends "admin/base_site.html" %}
 {% load static %}
 
+/* backoffice/mapa_malvinas/templates/mapa_malvinas/mapa_bloques.html - Actualizar sección de estilos */
+
 {% block extrastyle %}
 {{ block.super }}
 <style>
   .mapa-container {
     position: relative;
     width: 100%;
-    overflow-x: auto;
+    height: 150vh; /* Altura fija para el contenedor */
     background-color: #f8f9fa;
     padding: 20px;
     border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mapa-scroll-container {
+    flex: 1;
+    overflow: auto;
+    border: 2px solid #dee2e6;
+    border-radius: 5px;
+    background: white;
+    /* Hacer que la scrollbar sea más visible */
+    scrollbar-width: thick;
+    scrollbar-color: #6c757d #f8f9fa;
+  }
+
+  /* Personalizar scrollbars para WebKit browsers (Chrome, Safari, Edge) */
+  .mapa-scroll-container::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+  }
+
+  .mapa-scroll-container::-webkit-scrollbar-track {
+    background: #f8f9fa;
+    border-radius: 8px;
+  }
+
+  .mapa-scroll-container::-webkit-scrollbar-thumb {
+    background: #6c757d;
+    border-radius: 8px;
+    border: 2px solid #f8f9fa;
+  }
+
+  .mapa-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: #495057;
+  }
+
+  /* Hacer que el scroll corner sea visible */
+  .mapa-scroll-container::-webkit-scrollbar-corner {
+    background: #f8f9fa;
   }
 
   .mapa-grid {
     display: flex;
     flex-direction: column;
     gap: 20px;
+    min-width: 2200px; /* Ancho mínimo para mostrar las 10 secciones */
+    padding: 20px;
   }
 
   .mapa-fila {
@@ -33,6 +76,13 @@
     font-weight: bold;
     margin-bottom: 10px;
     text-align: center;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 2;
+    padding: 5px;
+    border-radius: 3px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
 
   .mapa-bloque-container {
@@ -73,6 +123,7 @@
     line-height: 1.3;
   }
 
+  /* Estados de bloques */
   .estado-libre {
     background-color: white;
   }
@@ -93,11 +144,19 @@
     background-color: #32cd32;
   }
 
+  /* Leyenda fija en la parte superior */
   .mapa-leyenda {
-    margin: 20px 0;
+    margin: 10px 0 20px 0;
     display: flex;
     flex-wrap: wrap;
     gap: 15px;
+    background: white;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid #dee2e6;
+    position: sticky;
+    top: 0;
+    z-index: 10;
   }
 
   .leyenda-item {
@@ -113,36 +172,88 @@
     border: 1px solid #333;
   }
 
-  /* Barra de navegación para secciones */
+  /* Barra de navegación para secciones - también fija */
   .nav-secciones {
-    position: sticky;
-    top: 0;
     background: #fff;
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
+    padding: 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
     z-index: 10;
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+    position: sticky;
+    top: 0;
   }
 
   .nav-seccion-btn {
-    padding: 5px 10px;
+    padding: 8px 12px;
     background: #f0f0f0;
     border: 1px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.2s;
   }
 
   .nav-seccion-btn:hover {
-    background: #e0e0e0;
+    background: #007bff;
+    color: white;
+    text-decoration: none;
+  }
+
+  /* Indicador de scroll */
+  .scroll-indicator {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    z-index: 1000;
+    display: none;
   }
 
   /* Estilos específicos para mayúsculas (bloques GEOGRÁFICOS) */
   .texto-mayusculas {
     text-transform: uppercase;
     font-weight: bold;
+  }
+
+  /* Botones de navegación rápida */
+  .navegacion-rapida {
+    position: fixed;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+  }
+
+  .nav-btn {
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    transition: all 0.2s;
+  }
+
+  .nav-btn:hover {
+    background: #0056b3;
+    transform: scale(1.1);
   }
 </style>
 {% endblock %}
@@ -188,6 +299,8 @@
     {% endfor %}{% endfor %}
   </div>
 
+    <!-- Contenedor mapa con scroll -->
+  <div class="mapa-scroll-container" id="mapaContainer">
   <div class="mapa-grid">
     {% for fila_secciones in filas %}
     <div class="mapa-fila">
@@ -210,4 +323,76 @@
     {% endfor %}
   </div>
 </div>
+</div>
+
+<!-- Botones de navegación rápida -->
+<div class="navegacion-rapida">
+  <button class="nav-btn" onclick="scrollToTop()" title="Ir arriba">↑</button>
+  <button class="nav-btn" onclick="scrollToBottom()" title="Ir abajo">↓</button>
+  <button class="nav-btn" onclick="scrollToLeft()" title="Ir izquierda">←</button>
+  <button class="nav-btn" onclick="scrollToRight()" title="Ir derecha">→</button>
+</div>
+
+<!-- Indicador de scroll -->
+<div class="scroll-indicator" id="scrollIndicator">
+  Posición: <span id="scrollPosition">0, 0</span>
+</div>
+
+<script>
+const container = document.getElementById('mapaContainer');
+const indicator = document.getElementById('scrollIndicator');
+const position = document.getElementById('scrollPosition');
+
+// Mostrar indicador de posición al hacer scroll
+container.addEventListener('scroll', function() {
+  const scrollLeft = Math.round(this.scrollLeft);
+  const scrollTop = Math.round(this.scrollTop);
+  
+  position.textContent = `${scrollLeft}, ${scrollTop}`;
+  
+  // Mostrar indicador temporalmente
+  indicator.style.display = 'block';
+  clearTimeout(window.scrollTimeout);
+  window.scrollTimeout = setTimeout(() => {
+    indicator.style.display = 'none';
+  }, 2000);
+});
+
+// Funciones de navegación rápida
+function scrollToTop() {
+  container.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function scrollToBottom() {
+  container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+}
+
+function scrollToLeft() {
+  container.scrollTo({ left: 0, behavior: 'smooth' });
+}
+
+function scrollToRight() {
+  container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' });
+}
+
+// Mejorar el comportamiento de los enlaces de sección
+document.querySelectorAll('.nav-seccion-btn').forEach(btn => {
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    const targetId = this.getAttribute('href').substring(1);
+    const target = document.getElementById(targetId);
+    
+    if (target) {
+      const containerRect = container.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+      
+      container.scrollTo({
+        left: container.scrollLeft + targetRect.left - containerRect.left - 20,
+        top: container.scrollTop + targetRect.top - containerRect.top - 20,
+        behavior: 'smooth'
+      });
+    }
+  });
+});
+</script>
 {% endblock %}
